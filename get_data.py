@@ -1,8 +1,7 @@
 from collections import defaultdict
-from pprint import pprint
 import json
 import spotipy
-import spotipy.util as util
+from spotipy.oauth2 import SpotifyClientCredentials
 
 
 class Artist:
@@ -25,34 +24,32 @@ class Artist:
 		return hash(self.artist_id)
 
 
-token = util.prompt_for_user_token("spotify:user:1248038176", "")
-if token:
-	sp = spotipy.Spotify(auth=token)
-	sp.trace = False
-else:
-	print("Can't get token")
+client_credentials_manager = SpotifyClientCredentials()
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 start = ["246dkjvS1zLTtiykXe5h60", "66CXWjxzNUsdJxJ2JdwvnR", "718COspgdWOnwOFpJHRZHS", "4kYSro6naA4h99UJvo89HB", "20JZFwl6HVl6yg8a4H3ZqK"]
 queue = []
+max_artists = 100000
+show_artists = 1000
+artist_set = set()
+artist_map = defaultdict(list)
 
 for cur_id in start:
 	cur = sp.artist(cur_id)
 	cur_artist = Artist(cur_id, cur["name"], cur["genres"], cur["followers"]["total"])
+	artist_set.add(cur_artist)
 	queue.append(cur_artist)
 
-i = 0
-max_artists = 100000
-artist_set = set()
-artist_map = defaultdict(list)
-
-while queue:
-	cur = queue.pop()
+while queue and len(artist_set) < max_artists:
+	cur = queue.pop(0)
 	artists = sp.artist_related_artists(cur.artist_id)
 	for artist in artists["artists"]:
 		related = Artist(artist["id"], artist["name"], artist["genres"], artist["followers"]["total"])
 		artist_map[cur.artist_id].append(related.artist_id)
-		if related not in artist_set and len(artist_set) < max_artists:
+		if related not in artist_set:
 			queue.append(related)
+			if len(artist_set) % show_artists == 0:
+				print("Current number of artists:", len(artist_set))
 		artist_set.add(related)
 
 json.dump(artist_map, open("related.json", "w+"), indent=4)
