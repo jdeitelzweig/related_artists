@@ -32,7 +32,7 @@ if token:
 else:
 	print("Can't get token")
 
-start = ["246dkjvS1zLTtiykXe5h60"]
+start = ["246dkjvS1zLTtiykXe5h60", "66CXWjxzNUsdJxJ2JdwvnR", "718COspgdWOnwOFpJHRZHS", "4kYSro6naA4h99UJvo89HB", "20JZFwl6HVl6yg8a4H3ZqK"]
 queue = []
 
 for cur_id in start:
@@ -41,7 +41,7 @@ for cur_id in start:
 	queue.append(cur_artist)
 
 i = 0
-max_artists = 100
+max_artists = 100000
 artist_set = set()
 artist_map = defaultdict(list)
 
@@ -55,8 +55,9 @@ while queue:
 			queue.append(related)
 		artist_set.add(related)
 
-json.dump(artist_map, open("related.json", "w+"))
+json.dump(artist_map, open("related.json", "w+"), indent=4)
 artists = {}
 for artist in artist_set:
 	artists[artist.artist_id] = vars(artist)
-json.dump(artists, open("artists.json", "w+"))
+print(len(artists))
+json.dump(artists, open("artists.json", "w+"), indent=4)
