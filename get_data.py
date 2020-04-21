@@ -31,6 +31,7 @@ start = ["246dkjvS1zLTtiykXe5h60", "66CXWjxzNUsdJxJ2JdwvnR", "718COspgdWOnwOFpJH
 queue = []
 max_artists = 100000
 show_artists = 1000
+follower_threshold = 1000
 artist_set = set()
 artist_map = defaultdict(list)
 
@@ -44,6 +45,8 @@ while queue and len(artist_set) < max_artists:
 	cur = queue.pop(0)
 	artists = sp.artist_related_artists(cur.artist_id)
 	for artist in artists["artists"]:
+		if artist["followers"]["total"] < 1000:
+			continue
 		related = Artist(artist["id"], artist["name"], artist["genres"], artist["followers"]["total"])
 		artist_map[cur.artist_id].append(related.artist_id)
 		if related not in artist_set:
