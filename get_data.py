@@ -5,6 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 
 class Artist:
+	'''Helper class for compiling information about artists'''
 	def __init__(self, artist_id, name, genres, followers):
 		self.artist_id = artist_id
 		self.name = name
@@ -45,7 +46,7 @@ while queue and len(artist_set) < max_artists:
 	cur = queue.pop(0)
 	artists = sp.artist_related_artists(cur.artist_id)
 	for artist in artists["artists"]:
-		if artist["followers"]["total"] < 1000:
+		if artist["followers"]["total"] < follower_threshold:
 			continue
 		related = Artist(artist["id"], artist["name"], artist["genres"], artist["followers"]["total"])
 		artist_map[cur.artist_id].append(related.artist_id)
