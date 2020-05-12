@@ -9,3 +9,4 @@ The full report can be found [here](https://docs.google.com/document/d/1izYrKyQ_
 
 Usage:
 ```python3 artist_map.py artist num_artists num_clusters```
+after registering an API key with Spotify
