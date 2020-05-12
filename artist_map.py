@@ -1,5 +1,5 @@
 import math
-import sys
+import argparse
 from collections import defaultdict
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -131,13 +131,19 @@ def show_graph(artist_info, G, clustering):
 
 def main():
 	'''Finds related artists to an input artist and constructs a clustered graph around them'''
+	# Read command line args
+	parser = argparse.ArgumentParser(description="Builds a graph of related artists colored by genre")
+	parser.add_argument("artist", help="The artist to construct the graph around")
+	parser.add_argument("num_artists", type=int, help="Number of artists to include in the graph")
+	parser.add_argument("num_clusters", type=int, help="Number of clusters to show in the graph")
+	args = parser.parse_args()
+
 	# Get artist info and build graph
-	num_clusters = int(sys.argv[3])
-	related, info = get_artists(sys.argv[1], int(sys.argv[2]))
+	related, info = get_artists(args.artist, args.num_artists)
 	artist_graph = build_graph(related)
 	# Spectral clustering
 	adj_mat = nx.to_numpy_matrix(artist_graph)
-	sc = SpectralClustering(num_clusters, affinity='precomputed', n_init=100, assign_labels='discretize')
+	sc = SpectralClustering(args.num_clusters, affinity='precomputed', n_init=100, assign_labels='discretize')
 	sc.fit(adj_mat)
 	# Draw graph
 	show_graph(info, artist_graph, sc)
